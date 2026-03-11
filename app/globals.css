@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* stylelint-disable-next-line at-rule-no-unknown */
 @theme {
   --color-indigo-50: #f0f9ff;
   --color-indigo-100: #e0f2fe;

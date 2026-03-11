@@ -54,7 +54,9 @@ export function BlockRenderer({ block }: { block: Block }) {
       let containerClass = "max-w-7xl mx-auto flex items-center px-8 relative";
 
       // Base Styles
-      if (variant === 'dark') {
+      if (block.content.theme === 'neobrutalist') {
+        headerClass += " w-full py-6 bg-white border-[4px] border-black shadow-[8px_8px_0px_black]";
+      } else if (variant === 'dark' || block.content.theme === 'tech' || block.content.theme === 'luxury') {
         headerClass += " w-full py-5 bg-gray-950 border-gray-800 text-white";
         if (!isFloating && variant !== 'glass') headerClass += " border-b";
       } else {
@@ -72,10 +74,14 @@ export function BlockRenderer({ block }: { block: Block }) {
         containerClass += " justify-between";
       }
 
-      // Floating/Sticky logic (already correct, just preserving)
+      // Floating/Sticky logic
       if (isFloating || variant === 'glass') {
-        headerClass = headerClass.replace('w-full', 'w-[calc(100%-2rem)] mx-auto mt-4 rounded-2xl shadow-xl border');
-        headerClass += variant === 'glass' ? " bg-white/70 backdrop-blur-md border-white/20" : (variant === 'dark' ? " bg-gray-950/90 backdrop-blur-md border-gray-800" : " bg-white/90 backdrop-blur-md border-gray-200");
+        if (block.content.theme === 'neobrutalist') {
+           headerClass = headerClass.replace('w-full', 'w-[calc(100%-4rem)] mx-auto mt-6 rounded-none');
+        } else {
+           headerClass = headerClass.replace('w-full', 'w-[calc(100%-2rem)] mx-auto mt-4 rounded-2xl shadow-xl border');
+           headerClass += variant === 'glass' ? " bg-white/70 backdrop-blur-md border-white/20" : (variant === 'dark' ? " bg-gray-950/90 backdrop-blur-md border-gray-800" : " bg-white/90 backdrop-blur-md border-gray-200");
+        }
       }
       if (isSticky) {
         headerClass += " sticky z-50";
@@ -92,11 +98,13 @@ export function BlockRenderer({ block }: { block: Block }) {
         else if (menuPosition === 'right' && logoPosition === 'right') navClass += " mr-auto ml-12 flex-row-reverse";
       }
 
+      const isReverse = logoPosition === 'right';
+
       return (
         <header className={headerClass} style={variant === 'dark' ? { backgroundColor: block.content.backgroundColor } : {}}>
           <div className={containerClass}>
             {/* Logo Section */}
-            <div className={`text-2xl font-black tracking-tighter ${variant === 'dark' ? 'text-white' : 'text-indigo-600'}`}>
+            <div className={`text-2xl font-black tracking-tighter ${variant === 'dark' || block.content.theme === 'tech' ? 'text-white' : (block.content.theme === 'neobrutalist' ? 'text-black' : 'text-indigo-600')}`}>
               {block.content.logoImage ? (
                 <Image src={block.content.logoImage} alt="Logo" width={140} height={35} className="h-7 w-auto object-contain" referrerPolicy="no-referrer" />
               ) : block.content.logoText}
@@ -104,7 +112,7 @@ export function BlockRenderer({ block }: { block: Block }) {
 
             {/* Menu Section */}
             <nav className={navClass}>
-              {block.content.links.map((link: string, i: number) => (
+              {block.content.links?.map((link: string, i: number) => (
                 <span
                   key={i}
                   onClick={() => handleScrollTo(linkTargets[link], scrollBehavior)}
@@ -145,7 +153,7 @@ export function BlockRenderer({ block }: { block: Block }) {
                     <button onClick={() => setIsMenuOpen(false)}><X className="w-8 h-8 text-gray-400" /></button>
                   </div>
                   <nav className="flex flex-col gap-8">
-                    {block.content.links.map((link: string, i: number) => (
+                    {block.content.links?.map((link: string, i: number) => (
                       <span key={i} onClick={() => { handleScrollTo(linkTargets[link], scrollBehavior); setIsMenuOpen(false); }} className="text-2xl font-bold text-gray-900 border-b border-gray-100 pb-4">{link}</span>
                     ))}
                   </nav>
@@ -157,7 +165,7 @@ export function BlockRenderer({ block }: { block: Block }) {
                 <div className="absolute inset-0 bg-indigo-600 flex flex-col items-center justify-center pointer-events-auto animate-in fade-in zoom-in duration-300 p-8">
                   <button onClick={() => setIsMenuOpen(false)} className="absolute top-8 right-8 text-white"><X className="w-10 h-10" /></button>
                   <nav className="flex flex-col items-center gap-10">
-                    {block.content.links.map((link: string, i: number) => (
+                    {block.content.links?.map((link: string, i: number) => (
                       <span key={i} onClick={() => { handleScrollTo(linkTargets[link], scrollBehavior); setIsMenuOpen(false); }} className="text-4xl md:text-6xl font-black text-white hover:scale-110 transition-transform cursor-pointer lowercase italic italic-style tracking-tighter">{link}</span>
                     ))}
                   </nav>
@@ -169,7 +177,7 @@ export function BlockRenderer({ block }: { block: Block }) {
                 <div className="absolute bottom-0 left-0 w-full bg-white rounded-t-[3rem] p-12 pointer-events-auto animate-in slide-in-from-bottom duration-300 shadow-2xl">
                   <div className="w-16 h-1.5 bg-gray-200 rounded-full mx-auto mb-10"></div>
                   <nav className="grid grid-cols-2 gap-8">
-                    {block.content.links.map((link: string, i: number) => (
+                    {block.content.links?.map((link: string, i: number) => (
                       <div key={i} onClick={() => { handleScrollTo(linkTargets[link], scrollBehavior); setIsMenuOpen(false); }} className="p-6 bg-gray-50 rounded-3xl flex items-center justify-center font-bold text-gray-900 text-lg">{link}</div>
                     ))}
                   </nav>
@@ -182,7 +190,7 @@ export function BlockRenderer({ block }: { block: Block }) {
                   <div className="bg-white/90 backdrop-blur-xl w-full max-w-sm rounded-[3rem] p-12 pointer-events-auto animate-in fade-in zoom-in duration-300 shadow-3xl text-center border border-white">
                     <button onClick={() => setIsMenuOpen(false)} className="mx-auto mb-8 bg-gray-100 p-3 rounded-full"><X className="w-6 h-6 text-gray-900" /></button>
                     <nav className="flex flex-col gap-6">
-                      {block.content.links.map((link: string, i: number) => (
+                      {block.content.links?.map((link: string, i: number) => (
                         <span key={i} onClick={() => { handleScrollTo(linkTargets[link], scrollBehavior); setIsMenuOpen(false); }} className="text-xl font-black text-gray-900 uppercase tracking-widest">{link}</span>
                       ))}
                     </nav>
@@ -199,7 +207,7 @@ export function BlockRenderer({ block }: { block: Block }) {
                       <X className="w-6 h-6 cursor-pointer" onClick={() => setIsMenuOpen(false)} />
                     </div>
                     <nav className="flex flex-wrap gap-4">
-                      {block.content.links.map((link: string, i: number) => (
+                      {block.content.links?.map((link: string, i: number) => (
                         <span key={i} onClick={() => { handleScrollTo(linkTargets[link], scrollBehavior); setIsMenuOpen(false); }} className="px-5 py-2 bg-gray-50 rounded-full text-sm font-bold text-gray-600 hover:bg-indigo-600 hover:text-white transition-all cursor-pointer">{link}</span>
                       ))}
                     </nav>
@@ -217,7 +225,7 @@ export function BlockRenderer({ block }: { block: Block }) {
         backgroundImage: `url(${block.content.backgroundImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-      } : { backgroundColor: block.content.backgroundColor || '#ffffff' };
+      } : { backgroundColor: block.content.backgroundColor || (block.content.theme === 'tech' || block.content.theme === 'luxury' || block.content.theme === 'neobrutalist' ? '#0a0a0a' : '#ffffff') };
 
       if (variant === 'impact') {
         return (
@@ -298,10 +306,10 @@ export function BlockRenderer({ block }: { block: Block }) {
 
       // Default Hero
       return (
-        <section className={`w-full py-24 px-8 text-center bg-white ${fontFamily}`}>
+        <section className={`w-full py-24 px-8 text-center ${fontFamily}`} style={{ backgroundColor: block.content.backgroundColor || '#ffffff' }}>
           <div className="max-w-3xl mx-auto space-y-8">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900">{block.content.title}</h1>
-            <p className="text-xl text-gray-500">{block.content.subtitle}</p>
+            <h1 className={`text-4xl md:text-6xl font-bold ${(block.content.backgroundColor && !block.content.backgroundColor.includes('f')) || block.content.theme === 'tech' ? 'text-white' : 'text-gray-900'}`}>{block.content.title}</h1>
+            <p className={`text-xl ${(block.content.backgroundColor && !block.content.backgroundColor.includes('f')) || block.content.theme === 'tech' ? 'text-gray-400' : 'text-gray-500'}`}>{block.content.subtitle}</p>
             <button className="px-8 py-4 bg-indigo-600 text-white rounded-lg font-bold">{block.content.buttonText}</button>
           </div>
         </section>
@@ -315,7 +323,7 @@ export function BlockRenderer({ block }: { block: Block }) {
              <div className="max-w-7xl mx-auto">
                <h2 className="text-3xl font-black uppercase tracking-widest mb-20 text-center">{block.content.title}</h2>
                <div className="grid grid-cols-1 md:grid-cols-3 gap-1px bg-gray-800 border border-gray-800">
-                 {block.content.items.map((item: any, i: number) => (
+                 {block.content.items?.map((item: any, i: number) => (
                    <div key={i} className="bg-gray-950 p-12 hover:bg-gray-900 transition-colors group">
                      <Zap className="w-10 h-10 text-indigo-500 mb-6 group-hover:scale-110 transition-transform" />
                      <h3 className="text-xl font-bold mb-4 uppercase">{item.title}</h3>
@@ -337,7 +345,7 @@ export function BlockRenderer({ block }: { block: Block }) {
                   <div className="w-12 h-1 bg-gray-200"></div>
                 </div>
                 <div className="flex-[2] grid grid-cols-1 sm:grid-cols-2 gap-12">
-                  {block.content.items.map((item: any, i: number) => (
+                  {block.content.items?.map((item: any, i: number) => (
                     <div key={i} className="space-y-4">
                        <span className="text-xs text-gray-400 font-bold tracking-widest uppercase">0{i+1}</span>
                        <h3 className="text-xl font-bold text-gray-900">{item.title}</h3>
@@ -352,11 +360,11 @@ export function BlockRenderer({ block }: { block: Block }) {
 
        if (variant === 'horizontal') {
          return (
-            <section className={`w-full py-24 px-8 bg-indigo-50 ${fontFamily}`}>
+             <section className={`w-full py-24 px-8 ${fontFamily}`} style={{ backgroundColor: block.content.backgroundColor || '#f0f4ff' }}>
               <div className="max-w-5xl mx-auto space-y-12">
                 <h2 className="text-4xl font-black text-gray-900 uppercase tracking-tighter text-center">{block.content.title}</h2>
                 <div className="flex flex-col gap-6">
-                  {block.content.items.map((item: any, i: number) => (
+                  {block.content.items?.map((item: any, i: number) => (
                     <div key={i} className="bg-white p-6 rounded-2xl flex items-center gap-6 shadow-sm hover:shadow-md transition-shadow">
                       <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center shrink-0">
                         <Check className="text-white w-6 h-6" />
@@ -375,11 +383,11 @@ export function BlockRenderer({ block }: { block: Block }) {
 
        // Default Features (Grid)
        return (
-         <section className={`w-full py-24 px-8 bg-gray-50 ${fontFamily}`}>
+         <section className={`w-full py-24 px-8 ${fontFamily}`} style={{ backgroundColor: block.content.backgroundColor || '#f9fafb' }}>
            <div className="max-w-7xl mx-auto">
              <h2 className="text-3xl font-bold text-center mb-16 text-gray-900">{block.content.title}</h2>
              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-               {block.content.items.map((item: any, i: number) => (
+               {block.content.items?.map((item: any, i: number) => (
                  <div key={i} className="bg-white p-10 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all border border-gray-100 items-start text-left">
                     <div className="w-16 h-16 bg-white shadow-lg rounded-2xl flex items-center justify-center mb-8 border border-gray-50">
                       {item.image ? <Image src={item.image} alt={item.title} width={32} height={32} /> : <Zap className="text-indigo-600 w-8 h-8" />}
@@ -438,7 +446,7 @@ export function BlockRenderer({ block }: { block: Block }) {
          )
        }
        return (
-        <section className={`w-full py-24 px-8 bg-white ${fontFamily}`}>
+        <section className={`w-full py-24 px-8 text-center bg-white ${fontFamily}`}>
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">{block.content.title}</h2>
             <p className="text-lg text-gray-600 leading-relaxed">{block.content.text}</p>
@@ -550,7 +558,7 @@ export function BlockRenderer({ block }: { block: Block }) {
          )
        }
        return (
-        <footer className={`w-full py-12 px-8 bg-white border-t border-gray-100 ${fontFamily}`} style={{ backgroundColor: block.content.backgroundColor, color: block.content.textColor }}>
+        <footer className={`w-full py-12 px-8 border-t border-gray-100 ${fontFamily}`} style={{ backgroundColor: block.content.backgroundColor, color: block.content.textColor }}>
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="font-bold text-gray-900 tracking-tighter">Alrion.</div>
             <p className="text-sm text-gray-500 leading-relaxed font-medium">{block.content.text}</p>
@@ -574,7 +582,7 @@ export function BlockRenderer({ block }: { block: Block }) {
             <div className="max-w-7xl mx-auto">
                <h2 className="text-5xl font-black text-cyan-400 mb-20 tracking-tighter uppercase italic border-b border-cyan-400 pl-4">{block.content.title}</h2>
                <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 px-2">
-                  {block.content.images.map((img: string, i: number) => (
+                  {block.content.images?.map((img: string, i: number) => (
                     <div 
                       key={i} 
                       onClick={() => clickableImages && setSelectedImage(img)}
@@ -597,7 +605,7 @@ export function BlockRenderer({ block }: { block: Block }) {
             <div className="max-w-5xl mx-auto space-y-24">
               <h2 className="text-6xl font-serif italic text-gray-950 text-center tracking-tight">{block.content.title}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
-                {block.content.images.slice(0, 4).map((img: string, i: number) => (
+                {block.content.images?.slice(0, 4).map((img: string, i: number) => (
                   <div 
                     key={i} 
                     onClick={() => clickableImages && setSelectedImage(img)}
@@ -614,11 +622,11 @@ export function BlockRenderer({ block }: { block: Block }) {
       }
 
       return (
-        <section className={`w-full py-24 px-8 bg-white ${fontFamily}`}>
+        <section className={`w-full py-24 px-8 ${fontFamily}`} style={{ backgroundColor: block.content.backgroundColor || '#ffffff' }}>
           <div className="max-w-7xl mx-auto">
              <h2 className="text-4xl font-black uppercase text-center mb-20 italic underline decoration-indigo-500/30 underline-offset-8 decoration-8">{block.content.title}</h2>
              <div className="columns-1 sm:columns-2 md:columns-3 gap-6 space-y-6">
-                {block.content.images.map((img: string, i: number) => (
+                {block.content.images?.map((img: string, i: number) => (
                   <div 
                     key={i} 
                     onClick={() => clickableImages && setSelectedImage(img)}
@@ -688,14 +696,14 @@ export function BlockRenderer({ block }: { block: Block }) {
           <section className={`w-full py-40 px-8 bg-white ${fontFamily}`}>
             <div className="max-w-4xl mx-auto text-center space-y-12">
                <Quote className="w-16 h-16 text-indigo-100 mx-auto mb-4" fill="currentColor" />
-               <h2 className="text-3xl md:text-5xl font-serif italic text-gray-900 leading-tight">&quot;{block.content.items[0].quote}&quot;</h2>
+               <h2 className="text-3xl md:text-5xl font-serif italic text-gray-900 leading-tight">&quot;{block.content.items?.[0].quote}&quot;</h2>
                <div className="flex flex-col items-center gap-4">
                   <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-100 shadow-sm">
-                    {block.content.items[0].avatar && <Image src={block.content.items[0].avatar} alt={block.content.items[0].author} width={64} height={64} className="w-full h-full object-cover" />}
+                    {block.content.items?.[0].avatar && <Image src={block.content.items?.[0].avatar} alt={block.content.items?.[0].author} width={64} height={64} className="w-full h-full object-cover" />}
                   </div>
                   <div className="text-center">
-                    <div className="font-bold text-gray-900 text-xl tracking-tight">{block.content.items[0].author}</div>
-                    <div className="text-indigo-600 font-medium text-sm uppercase tracking-widest">{block.content.items[0].role}</div>
+                    <div className="font-bold text-gray-900 text-xl tracking-tight">{block.content.items?.[0].author}</div>
+                    <div className="text-indigo-600 font-medium text-sm uppercase tracking-widest">{block.content.items?.[0].role}</div>
                   </div>
                </div>
             </div>
@@ -712,7 +720,7 @@ export function BlockRenderer({ block }: { block: Block }) {
                  <h2 className="text-green-500 font-mono text-sm tracking-widest uppercase">{block.content.title}</h2>
                </div>
                <div className="space-y-4">
-                  {block.content.items.map((item: any, i: number) => (
+                  {block.content.items?.map((item: any, i: number) => (
                     <div key={i} className="p-8 bg-gray-900/40 border border-white/5 rounded-xl font-mono text-xs md:text-sm group hover:border-green-500/30 transition-all">
                        <div className="text-gray-500 mb-2 invisible group-hover:visible">{"> "} SYSTEM_DECRYPTION_ACTIVE...</div>
                        <p className="text-gray-300 leading-relaxed italic mb-4">&quot;{item.quote}&quot;</p>
@@ -726,11 +734,11 @@ export function BlockRenderer({ block }: { block: Block }) {
       }
 
       return (
-        <section className={`w-full py-32 px-8 bg-indigo-50 ${fontFamily}`}>
+        <section className={`w-full py-32 px-8 ${fontFamily}`} style={{ backgroundColor: block.content.backgroundColor || '#f0f4ff' }}>
            <div className="max-w-7xl mx-auto">
               <h2 className="text-3xl font-bold text-center mb-20">{block.content.title}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                 {block.content.items.map((item: any, i: number) => (
+                 {block.content.items?.map((item: any, i: number) => (
                    <div key={i} className="bg-white/50 backdrop-blur-sm p-12 rounded-[3rem] border border-white/40 shadow-xl relative mt-8">
                       <div className="absolute -top-10 left-12 w-20 h-20 rounded-full border-4 border-white shadow-xl overflow-hidden bg-gray-200">
                         {item.avatar && <Image src={item.avatar} alt={item.author} width={80} height={80} className="w-full h-full object-cover" />}
@@ -748,6 +756,42 @@ export function BlockRenderer({ block }: { block: Block }) {
       );
 
     case 'pricing':
+      if (variant === 'saas') {
+        return (
+          <section className={`w-full py-32 px-8 ${fontFamily}`} style={{ backgroundColor: block.content.backgroundColor || '#f8fafc' }}>
+            <div className="max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {block.content.plans?.map((plan: any, i: number) => (
+                  <div key={i} className={`relative flex flex-col p-12 rounded-[2.5rem] bg-white border border-gray-100 transition-all hover:shadow-2xl ${plan.highlighted ? 'scale-105 z-10 border-indigo-500 ring-4 ring-indigo-500/10' : ''}`}>
+                    {plan.highlighted && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-tighter shadow-lg">Mais Popular</div>}
+                    <div className="mb-10">
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-5xl font-black text-gray-900 tracking-tighter">{plan.price}</span>
+                        <span className="text-gray-400 font-medium lowercase">/mês</span>
+                      </div>
+                    </div>
+                    <ul className="space-y-5 mb-12 flex-1">
+                      {plan.features?.map((f: string, j: number) => (
+                        <li key={j} className="flex items-center gap-3 text-sm text-gray-600 font-medium">
+                          <div className="w-5 h-5 bg-indigo-100 rounded-full flex items-center justify-center shrink-0">
+                            <Check className="w-3 h-3 text-indigo-600" />
+                          </div>
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <button className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest text-xs transition-all ${plan.highlighted ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-200' : 'bg-gray-50 text-gray-900 hover:bg-gray-100'}`}>
+                      {plan.buttonText}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )
+      }
+
       if (variant === 'minimal') {
         return (
           <section className={`w-full py-32 px-8 bg-white ${fontFamily}`}>
@@ -757,14 +801,14 @@ export function BlockRenderer({ block }: { block: Block }) {
                  <p className="text-gray-500 max-w-xl mx-auto">Preços transparentes para todos os tamanhos de negócio.</p>
                </div>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                 {block.content.plans.map((plan: any, i: number) => (
+                 {block.content.plans?.map((plan: any, i: number) => (
                    <div key={i} className={`p-10 rounded-3xl border-2 transition-all ${plan.highlighted ? 'border-indigo-600 shadow-2xl' : 'border-gray-100 hover:border-gray-300'}`}>
                       <h3 className="text-lg font-bold text-gray-900 mb-2">{plan.name}</h3>
                       <div className="flex items-baseline gap-1 mb-8">
                         <span className="text-4xl font-black text-gray-900">{plan.price}</span>
                       </div>
                       <ul className="space-y-4 mb-10">
-                        {plan.features.map((f: string, j: number) => <li key={j} className="flex items-center gap-3 text-sm text-gray-600 font-medium"> <Check className="w-4 h-4 text-indigo-600" /> {f}</li>)}
+                        {plan.features?.map((f: string, j: number) => <li key={j} className="flex items-center gap-3 text-sm text-gray-600 font-medium"> <Check className="w-4 h-4 text-indigo-600" /> {f}</li>)}
                       </ul>
                       <button className={`w-full py-4 rounded-xl font-bold text-sm transition-all ${plan.highlighted ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200' : 'bg-white border border-gray-200 text-gray-900 hover:bg-gray-50'}`}>
                         {plan.buttonText}
@@ -778,17 +822,17 @@ export function BlockRenderer({ block }: { block: Block }) {
       }
 
       return (
-        <section className={`w-full py-32 px-8 bg-white ${fontFamily}`}>
+        <section className={`w-full py-32 px-8 ${fontFamily}`} style={{ backgroundColor: block.content.backgroundColor || '#ffffff' }}>
            <div className="max-w-7xl mx-auto">
               <h2 className="text-5xl font-black italic tracking-tighter text-center mb-24 uppercase">{block.content.title}</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                 {block.content.plans.map((plan: any, i: number) => (
+                 {block.content.plans?.map((plan: any, i: number) => (
                    <div key={i} className={`p-1px rounded-[3rem] ${plan.highlighted ? 'bg-gradient-to-b from-indigo-600 to-indigo-900 shadow-2xl' : 'bg-gray-100 shadow-sm'}`}>
                       <div className="bg-white p-12 rounded-[3rem] h-full flex flex-col items-center text-center">
                          <h3 className="text-sm font-black uppercase tracking-[0.3em] text-indigo-600 mb-6">{plan.name}</h3>
                          <div className="text-5xl font-black mb-10 text-gray-950 leading-none">{plan.price}</div>
                          <ul className="space-y-4 mb-12 flex-1 text-gray-500 font-medium text-sm">
-                            {plan.features.map((f: string, j: number) => <li key={j} className="flex items-center gap-3"> <Check className="w-4 h-4 text-green-500 shrink-0" /> {f}</li>)}
+                            {plan.features?.map((f: string, j: number) => <li key={j} className="flex items-center gap-3"> <Check className="w-4 h-4 text-green-500 shrink-0" /> {f}</li>)}
                          </ul>
                          <button className={`w-full py-5 rounded-full font-black uppercase tracking-widest text-xs transition-all ${plan.highlighted ? 'bg-indigo-600 text-white shadow-xl hover:bg-indigo-700' : 'bg-gray-950 text-white hover:bg-black'}`}>
                             {plan.buttonText}
@@ -808,7 +852,7 @@ export function BlockRenderer({ block }: { block: Block }) {
             <div className="max-w-3xl mx-auto">
                <h2 className="text-4xl font-bold text-gray-900 mb-16 text-center">{block.content.title}</h2>
                <div className="space-y-px bg-gray-100 border border-gray-100 rounded-3xl overflow-hidden shadow-2xl">
-                  {block.content.questions.map((q: any, i: number) => (
+                  {block.content.questions?.map((q: any, i: number) => (
                     <div key={i} className="bg-white p-8 group cursor-pointer transition-colors hover:bg-gray-50/50">
                        <div className="flex items-center justify-between gap-6">
                           <h3 className="text-xl font-bold text-gray-900 leading-tight">{q.question}</h3>
@@ -828,11 +872,11 @@ export function BlockRenderer({ block }: { block: Block }) {
       }
 
        return (
-         <section className={`w-full py-24 px-8 bg-gray-50 ${fontFamily}`}>
+         <section className={`w-full py-24 px-8 ${fontFamily}`} style={{ backgroundColor: block.content.backgroundColor || '#f9fafb' }}>
            <div className="max-w-4xl mx-auto">
               <h2 className="text-3xl font-black uppercase tracking-widest text-center mb-20">{block.content.title}</h2>
               <div className="space-y-4">
-                 {block.content.questions.map((q: any, i: number) => (
+                 {block.content.questions?.map((q: any, i: number) => (
                    <div key={i} className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
                       <div className="flex items-center justify-between">
                          <h3 className="text-xl font-bold text-gray-900">{q.question}</h3>
@@ -926,7 +970,7 @@ export function BlockRenderer({ block }: { block: Block }) {
        }
 
        return (
-          <section className={`w-full py-32 px-8 bg-white border-y border-gray-50 ${fontFamily}`}>
+          <section className={`w-full py-32 px-8 ${fontFamily}`} style={{ backgroundColor: block.content.backgroundColor || '#ffffff' }}>
              <div className="max-w-7xl mx-auto">
                 <div className="bg-indigo-900/100 rounded-[4rem] text-white p-12 md:p-24 grid grid-cols-1 md:grid-cols-2 gap-20 shadow-[-40px_40px_0px_#e0f2fe]">
                   <div className="space-y-12">

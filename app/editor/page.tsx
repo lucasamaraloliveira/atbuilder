@@ -13,7 +13,8 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import {
   ArrowLeft, Code, Download, Layout, Plus, Settings, Menu,
   Trash2, GripVertical, ChevronUp, ChevronDown, Check, X,
-  Monitor, Laptop, Tablet, Smartphone, Upload, ChevronLeft, ChevronRight
+  Monitor, Laptop, Tablet, Smartphone, ArrowUp,
+  Settings2, Type, Sparkles, Upload, ChevronLeft, ChevronRight
 } from 'lucide-react';
 
 type PreviewMode = 'desktop' | 'notebook' | 'tablet' | 'smartphone' | 'iphone';
@@ -59,8 +60,8 @@ function EditorContent() {
       email: 'E-mail',
       address: 'Endereço',
       phone: 'Telefone',
-      modalTitle: 'Título do Modal',
-      modalText: 'Texto do Modal',
+      modalTitle: 'Título do Janela',
+      modalText: 'Texto da Janela',
       modalButton1Text: 'Texto do Botão 1',
       modalButton2Text: 'Texto do Botão 2',
       scrollBehavior: 'Comportamento da Rolagem',
@@ -69,12 +70,12 @@ function EditorContent() {
       logoPosition: 'Posição da Logo',
       menuPosition: 'Posição do Menu',
       headerAlignment: 'Alinhamento do Cabeçalho',
-      fontFamily: 'Fonte',
-      clickableImages: 'Imagens Clicáveis',
+      fontFamily: 'Fonte do Bloco',
+      clickableImages: 'Imagens Clicáveis (Abrir Modal)',
       showDarkModeToggle: 'Exibir Alternador de Tema',
       showSecondaryButton: 'Exibir Botão Secundário',
-      isSticky: 'Fixar no Topo (Sticky)',
-      isFloating: 'Estilo Flutuante',
+      isSticky: 'Cabeçalho Congelado (Acompanha a Página)',
+      isFloating: 'Cabeçalho Flutuante',
       variant: 'Variação Visual',
       modalType: 'Tipo de Janela (Modal)',
       imagePosition: 'Posição da Imagem',
@@ -97,11 +98,14 @@ function EditorContent() {
   };
 
   const handleAddBlock = (type: BlockType, customContent?: any) => {
-    blockIdCounter.current += 1;
+    const mergedContent = customContent 
+      ? { ...JSON.parse(JSON.stringify(defaultBlockContent[type])), ...JSON.parse(JSON.stringify(customContent)) }
+      : JSON.parse(JSON.stringify(defaultBlockContent[type]));
+
     const newBlock: Block = {
-      id: `${type}-${blockIdCounter.current}`,
+      id: `${type}-${Date.now()}`,
       type,
-      content: customContent ? JSON.parse(JSON.stringify(customContent)) : JSON.parse(JSON.stringify(defaultBlockContent[type])),
+      content: mergedContent,
     };
     setBlocks([...blocks, newBlock]);
     setSelectedBlockId(newBlock.id);
@@ -784,7 +788,8 @@ function EditorContent() {
                               <select
                                 value={value as string}
                                 onChange={(e) => handleUpdateBlockContent(selectedBlock.id, key, e.target.value)}
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white appearance-none cursor-pointer"
+                                style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
                               >
                                 <option value="left">Esquerda</option>
                                 <option value="center">Centro</option>
@@ -801,7 +806,8 @@ function EditorContent() {
                               <select
                                 value={value as string}
                                 onChange={(e) => handleUpdateBlockContent(selectedBlock.id, key, e.target.value)}
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white appearance-none cursor-pointer"
+                                style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
                               >
                                 <option value="left">Esquerda</option>
                                 <option value="center">Centro</option>
@@ -876,7 +882,8 @@ function EditorContent() {
                               <select
                                 value={value as string}
                                 onChange={(e) => handleUpdateBlockContent(selectedBlock.id, key, e.target.value)}
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white appearance-none cursor-pointer font-bold text-indigo-700"
+                                style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
                               >
                                 <option value="font-sans">Inter (Moderno/Corporativo)</option>
                                 <option value="font-serif">Playfair Display (Elegante/Editorial)</option>
@@ -895,7 +902,8 @@ function EditorContent() {
                               <select
                                 value={value as string}
                                 onChange={(e) => handleUpdateBlockContent(selectedBlock.id, key, e.target.value)}
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white appearance-none cursor-pointer"
+                                style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
                               >
                                 <option value="right">Direita</option>
                                 <option value="left">Esquerda</option>
@@ -967,23 +975,16 @@ function EditorContent() {
                         }
 
                         if (typeof value === 'boolean') {
-                          let label = key.replace(/([A-Z])/g, ' $1').trim();
-                          if (key === 'showDarkModeToggle') label = 'Exibir Modo Escuro (Tema)';
-                          if (key === 'isSticky') label = 'Cabeçalho Congelado';
-                          if (key === 'isFloating') label = 'Cabeçalho Flutuante';
-                          if (key === 'clickableImages') label = 'Imagens Clicáveis (Modal)';
-                          if (key === 'showSecondaryButton') label = 'Exibir Botão Secundário';
-
                           return (
-                            <div key={key} className="flex items-center justify-between py-2">
+                            <div key={key} className="flex items-center justify-between py-2 group/prop">
                               <label className="text-sm font-medium text-gray-700">
                                 {translateKey(key)}
                               </label>
                               <button
                                 onClick={() => handleUpdateBlockContent(selectedBlock.id, key, !value)}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${value ? 'bg-indigo-600' : 'bg-gray-200'}`}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${value ? 'bg-indigo-600' : 'bg-gray-300'}`}
                               >
-                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${value ? 'translate-x-6' : 'translate-x-1'}`} />
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${value ? 'translate-x-6' : 'translate-x-1'}`} />
                               </button>
                             </div>
                           );
@@ -1155,19 +1156,63 @@ function EditorContent() {
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {blockVariations[selectedBlockTypeForVariation].map((variation) => (
-                    <button
-                      key={variation.id}
-                      onClick={() => handleAddBlock(selectedBlockTypeForVariation, variation.content)}
-                      className="group flex flex-col text-left border border-gray-100 rounded-2xl overflow-hidden hover:border-indigo-600 hover:shadow-xl transition-all duration-300"
-                    >
-                      <div className={`aspect-video flex items-center justify-center border-b border-gray-100 relative group-hover:opacity-90 transition-all ${(variation.content.backgroundColor && variation.content.backgroundColor.includes('#0')) ||
-                          variation.name.toLowerCase().includes('dark') ||
-                          variation.name.toLowerCase().includes('noturno') ||
-                          variation.name.toLowerCase().includes('preto')
-                          ? 'bg-gray-900' : 'bg-gray-50'
-                        }`}>
+                <div className="space-y-6">
+                  {/* Smart Theme Filter Info */}
+                  {(() => {
+                    const lastBlock = blocks[blocks.length - 1];
+                    const currentTheme = lastBlock?.content?.theme || (blocks.find(b => b.content?.theme)?.content?.theme);
+                    
+                    if (!currentTheme) return null;
+
+                    return (
+                      <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-white p-2 rounded-xl shadow-sm">
+                            <Sparkles className="w-5 h-5 text-indigo-600" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-indigo-900">Composição Inteligente Ativa</p>
+                            <p className="text-[10px] text-indigo-600 mt-0.5">Estamos sugerindo blocos do tema <span className="uppercase font-black">{currentTheme}</span> para manter o estilo do seu site.</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {(() => {
+                      const lastBlock = blocks[blocks.length - 1];
+                      const currentTheme = lastBlock?.content?.theme || (blocks.find(b => b.content?.theme)?.content?.theme);
+                      
+                      // Sort variations so themed ones come first
+                      const variations = [...blockVariations[selectedBlockTypeForVariation]].sort((a, b) => {
+                        if (a.theme === currentTheme) return -1;
+                        if (b.theme === currentTheme) return 1;
+                        return 0;
+                      });
+
+                      return variations.map((variation) => (
+                        <button
+                          key={variation.id}
+                          onClick={() => handleAddBlock(selectedBlockTypeForVariation, { ...variation.content, theme: variation.theme })}
+                          className={`group flex flex-col text-left border rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl ${variation.theme === currentTheme ? 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-lg' : 'border-gray-100 hover:border-indigo-400'}`}
+                        >
+                          <div className={`aspect-video flex items-center justify-center border-b border-gray-100 relative group-hover:opacity-90 transition-all ${(variation.content.backgroundColor && variation.content.backgroundColor.includes('#0')) ||
+                              variation.theme === 'tech' || variation.theme === 'luxury'
+                              ? 'bg-gray-900' : 'bg-gray-50'
+                            }`}>
+                            
+                            {/* Theme Badge */}
+                            {variation.theme && (
+                              <div className={`absolute top-3 left-3 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter z-10 shadow-sm ${
+                                variation.theme === currentTheme 
+                                  ? 'bg-indigo-600 text-white animate-pulse' 
+                                  : 'bg-white/90 text-gray-500'
+                              }`}>
+                                {variation.theme === currentTheme ? '⭐ PAR IDEAL' : variation.theme}
+                              </div>
+                            )}
+
                         {/* More Dynamic Fake Preview */}
                         <div className={`w-4/5 h-3/5 rounded shadow-sm border overflow-hidden p-2 flex flex-col gap-1.5 transition-all ${(variation.content.backgroundColor && variation.content.backgroundColor.includes('#0')) ||
                             variation.name.toLowerCase().includes('dark') ||
@@ -1200,12 +1245,17 @@ function EditorContent() {
                           </div>
                         </div>
                       </div>
-                      <div className="p-4 bg-white">
-                        <h4 className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{variation.name}</h4>
-                        <p className="text-xs text-gray-500 mt-1">{variation.description}</p>
-                      </div>
-                    </button>
-                  ))}
+                        <div className="p-4 bg-white">
+                          <h4 className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors flex items-center gap-2">
+                            {variation.name}
+                            {variation.theme === currentTheme && <Sparkles className="w-3 h-3 text-indigo-500" />}
+                          </h4>
+                          <p className="text-xs text-gray-500 mt-1">{variation.description}</p>
+                        </div>
+                      </button>
+                    ));
+                  })()}
+                </div>
                 </div>
               )}
             </div>
