@@ -15,6 +15,8 @@ import {
   Trash2, GripVertical, ChevronUp, ChevronDown, Check, X,
   Monitor, Laptop, Tablet, Smartphone, Upload, ChevronLeft, ChevronRight
 } from 'lucide-react';
+import JSZip from 'jszip';
+
 
 type PreviewMode = 'desktop' | 'notebook' | 'tablet' | 'smartphone' | 'iphone';
 
@@ -143,17 +145,39 @@ function EditorContent() {
     }));
   };
 
+  const handleExport = async () => {
+    const zip = new JSZip();
+    const projectFiles = generateProject(blocks, exportFramework);
+
+    projectFiles.forEach(file => {
+      zip.file(file.path, file.content);
+    });
+
+    const content = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(content);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `atbuilder-${exportFramework}-project.zip`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+
   const selectedBlock = blocks.find(b => b.id === selectedBlockId);
 
   useEffect(() => {
     if (selectedBlockId) {
-      if (window.innerWidth < 1024) {
+      if (typeof window !== 'undefined' && window.innerWidth < 1024) {
         setIsMobileRightOpen(true);
       } else {
         setIsRightSidebarOpen(true);
       }
     }
-  }, [selectedBlockId]);
+  }, [selectedBlockId, setIsMobileRightOpen, setIsRightSidebarOpen]);
+
+  const projectFiles = React.useMemo(() => generateProject(blocks, exportFramework), [blocks, exportFramework]);
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 overflow-hidden relative">
@@ -215,12 +239,14 @@ function EditorContent() {
                 <span className="hidden lg:inline">Código</span>
               </button>
               <button
+                onClick={() => setShowCode(true)}
                 className="flex items-center gap-2 p-2 md:px-4 md:py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
                 title="Exportar"
               >
                 <Download className="w-4 h-4" />
                 <span className="hidden lg:inline">Exportar</span>
               </button>
+
               <button
                 onClick={() => setIsMobileRightOpen(!isMobileRightOpen)}
                 className={`p-2 rounded-lg transition-colors border lg:hidden ${selectedBlockId ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'text-gray-500 bg-white border-gray-300'}`}
@@ -907,9 +933,9 @@ function EditorContent() {
                         if (key.toLowerCase().includes('color')) {
                           return (
                             <div key={key} className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">
-                              {translateKey(key)}
-                            </label>
+                              <label className="block text-sm font-medium text-gray-700">
+                                {translateKey(key)}
+                              </label>
                               <div className="flex items-center gap-2">
                                 <input
                                   type="color"
@@ -931,9 +957,9 @@ function EditorContent() {
                         if (key.toLowerCase().includes('image')) {
                           return (
                             <div key={key} className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">
-                              {translateKey(key)}
-                            </label>
+                              <label className="block text-sm font-medium text-gray-700">
+                                {translateKey(key)}
+                              </label>
                               <div className="flex gap-2">
                                 <input
                                   type="text"
@@ -1106,13 +1132,13 @@ function EditorContent() {
                                 {type === 'header' ? <Layout className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
                               </div>
                               <span className="text-xs font-bold text-indigo-900 tracking-tight text-center capitalize">
-                                {type === 'header' ? 'Cabeçalho' : 
-                                 type === 'hero' ? 'Banner Principal' : 
-                                 type === 'features' ? 'Recursos' : 
-                                 type === 'cta' ? 'Chamada' : 
-                                 type === 'gallery' ? 'Galeria' : 
-                                 type === 'pricing' ? 'Preços' : 
-                                 type === 'contact' ? 'Contato' : type}
+                                {type === 'header' ? 'Cabeçalho' :
+                                  type === 'hero' ? 'Banner Principal' :
+                                    type === 'features' ? 'Recursos' :
+                                      type === 'cta' ? 'Chamada' :
+                                        type === 'gallery' ? 'Galeria' :
+                                          type === 'pricing' ? 'Preços' :
+                                            type === 'contact' ? 'Contato' : type}
                               </span>
                             </button>
                           ))}
@@ -1137,17 +1163,17 @@ function EditorContent() {
                             {type === 'header' ? <Layout className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
                           </div>
                           <span className="text-xs font-semibold text-gray-700 tracking-tight text-center">
-                            {type === 'header' ? 'Cabeçalho' : 
-                             type === 'hero' ? 'Banner Principal' : 
-                             type === 'features' ? 'Recursos' : 
-                             type === 'text' ? 'Texto' : 
-                             type === 'cta' ? 'Chamada' : 
-                             type === 'footer' ? 'Rodapé' : 
-                             type === 'gallery' ? 'Galeria' : 
-                             type === 'testimonials' ? 'Depoimentos' : 
-                             type === 'pricing' ? 'Preços' : 
-                             type === 'faq' ? 'FAQ' : 
-                             type === 'contact' ? 'Contato' : type}
+                            {type === 'header' ? 'Cabeçalho' :
+                              type === 'hero' ? 'Banner Principal' :
+                                type === 'features' ? 'Recursos' :
+                                  type === 'text' ? 'Texto' :
+                                    type === 'cta' ? 'Chamada' :
+                                      type === 'footer' ? 'Rodapé' :
+                                        type === 'gallery' ? 'Galeria' :
+                                          type === 'testimonials' ? 'Depoimentos' :
+                                            type === 'pricing' ? 'Preços' :
+                                              type === 'faq' ? 'FAQ' :
+                                                type === 'contact' ? 'Contato' : type}
                           </span>
                         </button>
                       ))}
@@ -1163,20 +1189,20 @@ function EditorContent() {
                       className="group flex flex-col text-left border border-gray-100 rounded-2xl overflow-hidden hover:border-indigo-600 hover:shadow-xl transition-all duration-300"
                     >
                       <div className={`aspect-video flex items-center justify-center border-b border-gray-100 relative group-hover:opacity-90 transition-all ${(variation.content.backgroundColor && variation.content.backgroundColor.includes('#0')) ||
-                          variation.name.toLowerCase().includes('dark') ||
-                          variation.name.toLowerCase().includes('noturno') ||
-                          variation.name.toLowerCase().includes('preto')
-                          ? 'bg-gray-900' : 'bg-gray-50'
+                        variation.name.toLowerCase().includes('dark') ||
+                        variation.name.toLowerCase().includes('noturno') ||
+                        variation.name.toLowerCase().includes('preto')
+                        ? 'bg-gray-900' : 'bg-gray-50'
                         }`}>
                         {/* More Dynamic Fake Preview */}
                         <div className={`w-4/5 h-3/5 rounded shadow-sm border overflow-hidden p-2 flex flex-col gap-1.5 transition-all ${(variation.content.backgroundColor && variation.content.backgroundColor.includes('#0')) ||
-                            variation.name.toLowerCase().includes('dark') ||
-                            variation.name.toLowerCase().includes('noturno') ||
-                            variation.name.toLowerCase().includes('preto')
-                            ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                          variation.name.toLowerCase().includes('dark') ||
+                          variation.name.toLowerCase().includes('noturno') ||
+                          variation.name.toLowerCase().includes('preto')
+                          ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                           }`}>
                           <div className={`h-1.5 w-1/2 rounded ${variation.name.toLowerCase().includes('vibrante') || variation.name.toLowerCase().includes('azul') || variation.name.toLowerCase().includes('marca')
-                              ? 'bg-indigo-400' : 'bg-gray-200'
+                            ? 'bg-indigo-400' : 'bg-gray-200'
                             } ${variation.id.includes('center') || variation.name.toLowerCase().includes('centralizado') ? 'mx-auto' : ''}`} />
 
                           <div className="space-y-1">
@@ -1191,7 +1217,7 @@ function EditorContent() {
                           ) : null}
 
                           <div className={`mt-auto h-2.5 w-1/3 rounded-sm ${variation.name.toLowerCase().includes('vibrante') || variation.name.toLowerCase().includes('azul') || variation.name.toLowerCase().includes('marca')
-                              ? 'bg-white' : 'bg-indigo-500'
+                            ? 'bg-white' : 'bg-indigo-500'
                             } ${variation.id.includes('center') || variation.name.toLowerCase().includes('centralizado') ? 'mx-auto' : 'self-start'}`} />
                         </div>
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1215,96 +1241,102 @@ function EditorContent() {
 
       {/* Code Modal */}
       {showCode && (() => {
-        const projectFiles = generateProject(blocks, exportFramework);
         const currentFile = projectFiles[selectedFileIndex] || projectFiles[0];
-        
+
         return (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[200] p-4 md:p-12 backdrop-blur-xl">
-          <div className="bg-[#0a0c10] rounded-[3rem] shadow-3xl w-full max-w-6xl h-[85vh] flex flex-col overflow-hidden border border-white/10 ring-1 ring-white/5">
-            {/* Modal Header */}
-            <div className="flex flex-col md:flex-row items-center justify-between p-8 border-b border-white/5 bg-[#0a0c10] gap-6">
-              <div className="flex items-center gap-4">
-                <div className="bg-indigo-600/20 p-3 rounded-2xl border border-indigo-500/20">
-                  <Code className="w-6 h-6 text-indigo-400" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black text-white tracking-tight uppercase italic italic-style">Export Engine <span className="text-indigo-500">v2.0</span></h3>
-                  <div className="flex gap-2 mt-1">
-                    {(['nextjs', 'react', 'static'] as Framework[]).map((fw) => (
-                      <button 
-                        key={fw}
-                        onClick={() => { setExportFramework(fw); setSelectedFileIndex(0); }}
-                        className={`text-[10px] uppercase tracking-widest px-3 py-1 rounded-full font-bold transition-all ${exportFramework === fw ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white/5 text-gray-500 hover:text-gray-300'}`}
-                      >
-                        {fw === 'nextjs' ? 'Next.js Project' : fw === 'react' ? 'React (Vite)' : 'Static (HTML/CSS)'}
-                      </button>
-                    ))}
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[200] p-4 md:p-12 backdrop-blur-xl">
+            <div className="bg-[#0a0c10] rounded-[3rem] shadow-3xl w-full max-w-6xl h-[85vh] flex flex-col overflow-hidden border border-white/10 ring-1 ring-white/5">
+              {/* Modal Header */}
+              <div className="flex flex-col md:flex-row items-center justify-between p-8 border-b border-white/5 bg-[#0a0c10] gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="bg-indigo-600/20 p-3 rounded-2xl border border-indigo-500/20">
+                    <Code className="w-6 h-6 text-indigo-400" />
                   </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(currentFile.content);
-                    alert('Arquivo copiado!');
-                  }}
-                  className="px-6 py-3 text-sm font-black text-white bg-white/10 hover:bg-white/20 border border-white/10 rounded-2xl transition-all uppercase tracking-widest flex items-center gap-2"
-                >
-                  <Download className="w-4 h-4" /> Copiar Arquivo
-                </button>
-                <button 
-                  onClick={() => setShowCode(false)} 
-                  className="bg-white/5 p-3 text-gray-400 hover:text-white hover:bg-red-500/20 hover:text-red-400 rounded-2xl transition-all border border-white/5"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Body */}
-            <div className="flex flex-1 overflow-hidden">
-              {/* File Tree Sidebar */}
-              <div className="w-64 border-r border-white/5 bg-[#0a0c10] flex flex-col">
-                <div className="p-6">
-                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 mb-4 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></span> FILE_TREE.LOG
-                  </div>
-                  <div className="space-y-1">
-                    {projectFiles.map((file, idx) => {
-                      const parts = file.path.split('/');
-                      const name = parts[parts.length - 1];
-                      const folderName = parts.length > 1 ? parts[0] + '/' : '';
-                      return (
+                  <div>
+                    <h3 className="text-2xl font-black text-white tracking-tight uppercase italic italic-style">Export Engine <span className="text-indigo-500">v2.0</span></h3>
+                    <div className="flex gap-2 mt-1">
+                      {(['nextjs', 'react', 'static'] as Framework[]).map((fw) => (
                         <button
-                          key={idx}
-                          onClick={() => setSelectedFileIndex(idx)}
-                          className={`w-full text-left p-3 rounded-xl transition-all flex flex-col group ${selectedFileIndex === idx ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}`}
+                          key={fw}
+                          onClick={() => { setExportFramework(fw); setSelectedFileIndex(0); }}
+                          className={`text-[10px] uppercase tracking-widest px-3 py-1 rounded-full font-bold transition-all ${exportFramework === fw ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white/5 text-gray-500 hover:text-gray-300'}`}
                         >
-                          {folderName && <span className={`text-[8px] font-mono leading-none mb-1 ${selectedFileIndex === idx ? 'text-indigo-200' : 'text-gray-600'}`}>{folderName}</span>}
-                          <span className={`text-xs font-bold font-mono tracking-tight ${selectedFileIndex === idx ? '' : 'truncate'}`}>{name}</span>
+                          {fw === 'nextjs' ? 'Next.js Project' : fw === 'react' ? 'React (Vite)' : 'Static (HTML/CSS)'}
                         </button>
-                      );
-                    })}
+                      ))}
+                    </div>
                   </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={handleExport}
+                    className="px-6 py-3 text-sm font-black text-white bg-indigo-600 hover:bg-indigo-700 border border-indigo-500 rounded-2xl transition-all uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-indigo-600/20"
+                  >
+                    <Download className="w-4 h-4" /> Baixar Projeto (.zip)
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(currentFile.content);
+                      alert('Arquivo copiado!');
+                    }}
+                    className="px-6 py-3 text-sm font-black text-white bg-white/10 hover:bg-white/20 border border-white/10 rounded-2xl transition-all uppercase tracking-widest flex items-center gap-2"
+                  >
+                    <Check className="w-4 h-4" /> Copiar Arquivo
+                  </button>
+
+                  <button
+                    onClick={() => setShowCode(false)}
+                    className="bg-white/5 p-3 text-gray-400 hover:text-white hover:bg-red-500/20 hover:text-red-400 rounded-2xl transition-all border border-white/5"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
                 </div>
               </div>
 
-              {/* Code Editor Preview */}
-              <div className="flex-1 overflow-auto bg-[#0a0c10] relative">
-                <div className="absolute top-4 right-6 text-[10px] font-mono text-gray-700 pointer-events-none uppercase tracking-widest">
-                  READ_ONLY // {currentFile.path}
+              {/* Modal Body */}
+              <div className="flex flex-1 overflow-hidden">
+                {/* File Tree Sidebar */}
+                <div className="w-64 border-r border-white/5 bg-[#0a0c10] flex flex-col">
+                  <div className="p-6">
+                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 mb-4 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></span> FILE_TREE.LOG
+                    </div>
+                    <div className="space-y-1">
+                      {projectFiles.map((file, idx) => {
+                        const parts = file.path.split('/');
+                        const name = parts[parts.length - 1];
+                        const folderName = parts.length > 1 ? parts[0] + '/' : '';
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => setSelectedFileIndex(idx)}
+                            className={`w-full text-left p-3 rounded-xl transition-all flex flex-col group ${selectedFileIndex === idx ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}`}
+                          >
+                            {folderName && <span className={`text-[8px] font-mono leading-none mb-1 ${selectedFileIndex === idx ? 'text-indigo-200' : 'text-gray-600'}`}>{folderName}</span>}
+                            <span className={`text-xs font-bold font-mono tracking-tight ${selectedFileIndex === idx ? '' : 'truncate'}`}>{name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
-                <SyntaxHighlighter
-                  language={currentFile.path.endsWith('.json') ? 'json' : (currentFile.path.endsWith('.js') ? 'javascript' : (currentFile.path.endsWith('.html') ? 'html' : 'tsx'))}
-                  style={vscDarkPlus}
-                  customStyle={{ margin: 0, padding: '2rem', background: 'transparent', fontSize: '0.8rem', lineHeight: '1.6' }}
-                >
-                  {currentFile.content}
-                </SyntaxHighlighter>
+
+                {/* Code Editor Preview */}
+                <div className="flex-1 overflow-auto bg-[#0a0c10] relative">
+                  <div className="absolute top-4 right-6 text-[10px] font-mono text-gray-700 pointer-events-none uppercase tracking-widest">
+                    READ_ONLY // {currentFile.path}
+                  </div>
+                  <SyntaxHighlighter
+                    language={currentFile.path.endsWith('.json') ? 'json' : (currentFile.path.endsWith('.js') ? 'javascript' : (currentFile.path.endsWith('.html') ? 'html' : 'tsx'))}
+                    style={vscDarkPlus}
+                    customStyle={{ margin: 0, padding: '2rem', background: 'transparent', fontSize: '0.8rem', lineHeight: '1.6' }}
+                  >
+                    {currentFile.content}
+                  </SyntaxHighlighter>
+                </div>
               </div>
             </div>
           </div>
-        </div>
         );
       })()}
 
